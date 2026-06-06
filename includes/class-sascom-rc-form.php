@@ -326,7 +326,14 @@ class Sascom_RC_Form {
 		$reason           = isset( $_POST['reason'] ) ? sanitize_text_field( wp_unslash( $_POST['reason'] ) ) : '';
 		$customer_message = isset( $_POST['customer_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['customer_message'] ) ) : '';
 		$bank_account     = isset( $_POST['bank_account'] ) ? sanitize_text_field( wp_unslash( $_POST['bank_account'] ) ) : '';
-		$raw_items        = isset( $_POST['items'] ) && is_array( $_POST['items'] ) ? wp_unslash( $_POST['items'] ) : array();
+
+		// Pozycje: klucze (item_id) i wartości (ilości) sanityzowane od razu do dodatnich int.
+		$raw_items = array();
+		if ( isset( $_POST['items'] ) && is_array( $_POST['items'] ) ) {
+			foreach ( wp_unslash( $_POST['items'] ) as $item_key => $item_qty ) {
+				$raw_items[ absint( $item_key ) ] = absint( $item_qty );
+			}
+		}
 
 		// Serwerowe limity długości (defense in depth – maxlength w HTML można obejść).
 		$reason           = $this->limit_length( $reason, 200 );
