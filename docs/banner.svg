@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Warstwa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 1200 627">
+  <!-- Generator: Adobe Illustrator 29.8.7, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #eb8d06;
+      }
+
+      .st1 {
+        fill: #9fc0d4;
+        font-size: 16px;
+      }
+
+      .st1, .st2, .st3, .st4, .st5, .st6, .st7, .st8, .st9 {
+        isolation: isolate;
+      }
+
+      .st1, .st2, .st3, .st5, .st6 {
+        font-family: Sora-SemiBold, Sora;
+        font-weight: 600;
+      }
+
+      .st10 {
+        fill: url(#Gradient_bez_nazwy);
+      }
+
+      .st11, .st2 {
+        fill: #1aa8b6;
+      }
+
+      .st2 {
+        letter-spacing: .1em;
+      }
+
+      .st2, .st5 {
+        font-size: 22px;
+      }
+
+      .st3 {
+        fill: #f3f7fa;
+        font-size: 17px;
+      }
+
+      .st12, .st5, .st6, .st7, .st9 {
+        fill: #fff;
+      }
+
+      .st13 {
+        fill: none;
+        stroke: #fff;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 3px;
+      }
+
+      .st4 {
+        fill: #cfe2ee;
+        font-size: 25px;
+      }
+
+      .st4, .st7 {
+        font-family: Sora-Medium, Sora;
+        font-weight: 500;
+      }
+
+      .st14 {
+        fill: #076fa6;
+      }
+
+      .st15 {
+        fill: #d7074f;
+      }
+
+      .st6 {
+        font-size: 56px;
+      }
+
+      .st7 {
+        font-size: 20px;
+      }
+
+      .st8 {
+        fill: #a9c6d8;
+        font-family: Sora-Regular, Sora;
+        font-size: 15px;
+      }
+
+      .st9 {
+        opacity: 0;
+      }
+    </style>
+    <linearGradient id="Gradient_bez_nazwy" data-name="Gradient bez nazwy" x1="0" y1="629" x2="1" y2="628" gradientTransform="translate(0 394382) scale(1200 -627)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b2a45"/>
+      <stop offset="1" stop-color="#0f3f63"/>
+    </linearGradient>
+  </defs>
+  <rect class="st10" width="1200" height="627"/>
+  <g>
+    <rect class="st14" width="300" height="9"/>
+    <rect class="st11" x="300" width="300" height="9"/>
+    <rect class="st0" x="600" width="300" height="9"/>
+    <rect class="st15" x="900" width="300" height="9"/>
+    <rect class="st15" y="618" width="300" height="9"/>
+    <rect class="st0" x="300" y="618" width="300" height="9"/>
+    <rect class="st11" x="600" y="618" width="300" height="9"/>
+    <rect class="st14" x="900" y="618" width="300" height="9"/>
+  </g>
+  <g>
+    <path class="st14" d="M1134.6,86l-80.4,21.6c-.1,0-.3,0-.4.1l-.7.2c-.1,0-.2,0-.4,0l-.6.2c0,0-.1,0-.2,0l-.6.2h-.3c0,0-1.1.4-1.1.4-.2,0-.5.1-.7.2-.2,0-.4.1-.7.2,0,0-.2,0-.2,0h-.5c0,.1-.2.2-.2.2h-.6c0,.2-.1.2-.2.2h-.4c0,.1-.1.1-.2.2,0,0-.2,0-.3,0h-.3c-.1.1-.3.1-.4.2,0,0-.2,0-.2,0-.1,0-.2,0-.3,0,0,0,0,0-.1,0-.3,0-.6.2-.9.2,0,0,0,0-.1,0,0,0,0,0,0,0h-.1s0,0,0,0c0,0,0,0,0,0,0,0,0,0,0,0-1.4.4-2.6,1.3-3.2,2.5-.7,1.2-.9,2.6-.5,4.1l-1.4-5.2-6.9-25.9,45.6-26.3c3.9-2.2,8.6-2.2,12.5,0,0,0,45.6,26.3,45.6,26.3Z"/>
+    <path class="st15" d="M1054.1,107.5l2-.5c-.7.2-1.3.4-2,.5Z"/>
+    <path class="st15" d="M1153.5,104.1v54.8l-56.9-33c-.1,0-.1-.2,0-.3,0,0,11.6-19.2,15.4-25.6,2.1-3.4-1.1-7.6-4.9-6.6-10.6,2.8-35.1,9.4-50.5,13.5l78.1-20.9,12.7,7.3c3.9,2.2,6.2,6.3,6.2,10.8h0Z"/>
+    <path class="st0" d="M1136.5,188.5l-47.5,27.4c-3.9,2.2-8.6,2.2-12.5,0l-12.7-7.3-24.5-91.5c5.7,21.4,11.5,42.7,17.2,64.1,1,3.8,6.1,4.4,8,1l14.6-26.3c0-.1.2-.2.3,0l57.1,32.8h0Z"/>
+    <path class="st11" d="M1063.8,208.5l-45.6-26.3c-3.9-2.2-6.2-6.3-6.2-10.8v-67.3c0-2.2.6-4.4,1.7-6.2,1.1-1.9,2.6-3.4,4.6-4.6l12.7-7.3,6.9,25.9,1.4,5.2,24.5,91.5Z"/>
+    <path class="st12" d="M1153.5,158.9v12.5c0,2.2-.6,4.4-1.7,6.2-1.1,1.9-2.6,3.4-4.6,4.6l-10.8,6.2-57.1-32.8c-.1,0-.3,0-.3,0l-14.6,26.3c-1.9,3.4-7,2.8-8-1-5.7-21.4-11.5-42.7-17.2-64.1-.4-1.4-.1-2.9.5-4.1.7-1.2,1.8-2.1,3.2-2.5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,.1,0,0,0,0,0,0,0,0,0,0,0,.1,0,.2,0,.5-.1.9-.2,0,0,0,0,.1,0,.1,0,.2,0,.3,0,0,0,.2,0,.2,0,.1,0,.3,0,.4-.1,0,0,.2,0,.3,0,0,0,.2,0,.3,0,0,0,.1,0,.2,0,.1,0,.3,0,.4-.1,0,0,.1,0,.2,0,.2,0,.4,0,.6-.1,0,0,.2,0,.2,0,.2,0,.3,0,.5-.1,0,0,.2,0,.2,0,.2,0,.4-.1.7-.2.2,0,.5-.1.7-.2,0,0,.2,0,.3,0,.2,0,.4,0,.6-.1,0,0,.2,0,.3,0h.3c.2-.1.4-.2.6-.3,0,0,.1,0,.2,0,.2,0,.4-.1.6-.2.1,0,.2,0,.4,0,.2,0,.5-.1.7-.2.1,0,.3,0,.4-.1.6-.2,1.3-.3,2-.5.1,0,.3,0,.4-.1,15.4-4.1,39.9-10.7,50.5-13.5,3.9-1,7,3.1,4.9,6.6-3.9,6.4-15.4,25.6-15.4,25.6,0,.1,0,.3,0,.3l56.9,33h0Z"/>
+  </g>
+  <text class="st2" transform="translate(80 118)"><tspan x="0" y="0">WORDPRESS · WOOCOMMERCE</tspan></text>
+  <text class="st6" transform="translate(80 192)"><tspan x="0" y="0">Returns &amp; Complaints</tspan></text>
+  <text class="st6" transform="translate(80 252)"><tspan x="0" y="0">for WooCommerce</tspan></text>
+  <text class="st4" transform="translate(80 305)"><tspan x="0" y="0">Publiczny formularz zwrotów i reklamacji - także dla klientów bez konta.</tspan></text>
+  <rect class="st9" x="80" y="338" width="720" height="64" rx="10" ry="10"/>
+  <path class="st0" d="M83,338h0c1.7,0,3,1.3,3,3v58c0,1.7-1.3,3-3,3h0c-1.7,0-3-1.3-3-3v-58c0-1.7,1.3-3,3-3Z"/>
+  <text class="st3" transform="translate(104 366)"><tspan x="0" y="0">Obowiązek z ustawy o prawach konsumenta</tspan></text>
+  <text class="st8" transform="translate(104 390)"><tspan x="0" y="0">dyrektywy 2011/83/UE (odstąpienie) i (UE) 2019/771 (reklamacje)</tspan></text>
+  <g>
+    <g>
+      <circle class="st11" cx="93" cy="442" r="13"/>
+      <path class="st13" d="M87,442l4,4,8-9"/>
+      <text class="st7" transform="translate(118 448)"><tspan x="0" y="0">Działa dla gości (nr zamówienia + e-mail)</tspan></text>
+    </g>
+    <g>
+      <circle class="st14" cx="93" cy="484" r="13"/>
+      <path class="st13" d="M87,484l4,4,8-9"/>
+      <text class="st7" transform="translate(118 490)"><tspan x="0" y="0">Zwrot / odstąpienie oraz reklamacja</tspan></text>
+    </g>
+    <g>
+      <circle class="st15" cx="93" cy="526" r="13"/>
+      <path class="st13" d="M87,526l4,4,8-9"/>
+      <text class="st7" transform="translate(118 532)"><tspan x="0" y="0">Statusy, e-maile, anti-spam, zgodność z HPOS</tspan></text>
+    </g>
+  </g>
+  <g>
+    <rect class="st0" x="820" y="470" width="300" height="64" rx="14" ry="14"/>
+    <text class="st5" transform="translate(876.9 510)"><tspan x="0" y="0">Dowiedz się więcej</tspan></text>
+  </g>
+  <circle class="st0" cx="86" cy="594" r="6"/>
+  <text class="st1" transform="translate(102 600)"><tspan x="0" y="0">Bartosz Sudół · sascom.pl</tspan></text>
+</svg>

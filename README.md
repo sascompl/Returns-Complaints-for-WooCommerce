@@ -1,5 +1,7 @@
 # Returns & Complaints for WooCommerce
 
+![Returns & Complaints for WooCommerce](docs/banner.png)
+
 ## Description
 
 Lightweight WooCommerce plugin that adds a public return, withdrawal and complaint
@@ -8,7 +10,7 @@ request form, including support for guest customers.
 Customers identify their order with the order number and the e-mail address used at
 checkout. The plugin verifies the order against its `billing_email`, never exposing
 order data when the e-mail does not match. Each submission creates a dedicated
-`sascom_return_request` custom post type entry, sends a confirmation e-mail to the
+`sascom_rc_request` custom post type entry, sends a confirmation e-mail to the
 customer and a notification to the store administrator, and links the request back to
 the WooCommerce order (private order note, flag, request list and an admin-only column
 on the orders list).
