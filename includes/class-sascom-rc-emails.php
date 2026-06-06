@@ -135,7 +135,6 @@ class Sascom_RC_Emails {
 			$instructions = (string) apply_filters( 'sascom_rc_complaint_instructions', $base['instructions'] );
 			$contact      = (string) apply_filters( 'sascom_rc_complaint_contact_email', $base['contact'] );
 			$header       = __( 'Instrukcja dotycząca reklamacji:', 'returns-complaints-for-woocommerce' );
-			$address_label = __( 'Adres do reklamacji:', 'returns-complaints-for-woocommerce' );
 		} else {
 			$base = Sascom_RC_Settings::get_return_data();
 
@@ -144,29 +143,40 @@ class Sascom_RC_Emails {
 			$instructions = (string) apply_filters( 'sascom_rc_return_instructions', $base['instructions'] );
 			$contact      = (string) apply_filters( 'sascom_rc_return_contact_email', $base['contact'] );
 			$header       = __( 'Instrukcja odesłania produktu:', 'returns-complaints-for-woocommerce' );
-			$address_label = __( 'Adres zwrotu:', 'returns-complaints-for-woocommerce' );
 		}
 
-		$lines = array();
+		// Każda sekcja oddzielona pustą linią dla czytelności.
+		$sections = array();
 
+		// Sposób odesłania: na adres i/lub do paczkomatu (alternatywy).
+		$ship_to = array();
 		if ( '' !== trim( $address ) ) {
-			$lines[] = $address_label . ' ' . $address;
+			$ship_to[] = '- ' . __( 'na adres:', 'returns-complaints-for-woocommerce' ) . "\n" . trim( $address );
 		}
 		if ( '' !== trim( $parcel ) ) {
-			$lines[] = __( 'Paczkomat:', 'returns-complaints-for-woocommerce' ) . ' ' . $parcel;
+			$ship_to[] = '- ' . __( 'do paczkomatu:', 'returns-complaints-for-woocommerce' ) . ' ' . trim( $parcel );
 		}
-		if ( '' !== trim( $instructions ) ) {
-			$lines[] = __( 'Dodatkowe instrukcje:', 'returns-complaints-for-woocommerce' ) . ' ' . $instructions;
-		}
-		if ( '' !== trim( $contact ) ) {
-			$lines[] = __( 'E-mail kontaktowy:', 'returns-complaints-for-woocommerce' ) . ' ' . $contact;
+		if ( ! empty( $ship_to ) ) {
+			$intro = ( count( $ship_to ) > 1 )
+				? __( 'Produkt możesz odesłać na jeden z poniższych sposobów:', 'returns-complaints-for-woocommerce' )
+				: __( 'Produkt prosimy odesłać:', 'returns-complaints-for-woocommerce' );
+			$sections[] = $intro . "\n" . implode( "\n", $ship_to );
 		}
 
-		if ( empty( $lines ) ) {
+		// Dodatkowe instrukcje – w osobnym bloku, treść od nowej linii.
+		if ( '' !== trim( $instructions ) ) {
+			$sections[] = __( 'Dodatkowe instrukcje:', 'returns-complaints-for-woocommerce' ) . "\n" . trim( $instructions );
+		}
+
+		if ( '' !== trim( $contact ) ) {
+			$sections[] = __( 'E-mail kontaktowy:', 'returns-complaints-for-woocommerce' ) . ' ' . trim( $contact );
+		}
+
+		if ( empty( $sections ) ) {
 			return '';
 		}
 
-		return "\n" . $header . "\n" . implode( "\n", $lines ) . "\n";
+		return "\n" . $header . "\n\n" . implode( "\n\n", $sections ) . "\n";
 	}
 
 	/**
