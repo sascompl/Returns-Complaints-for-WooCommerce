@@ -40,5 +40,6 @@ final class Sascom_RC {
 		( new Sascom_RC_CPT() )->hooks();
 		( new Sascom_RC_Form() )->hooks();
 		( new Sascom_RC_Admin() )->hooks();
+		( new Sascom_RC_Settings() )->hooks();
 	}
 }

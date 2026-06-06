@@ -79,6 +79,20 @@
 	font-size: .85em;
 }
 
+.sascom-rc-product-unavailable {
+	opacity: .6;
+}
+
+.sascom-rc-product-unavailable .sascom-rc-product-label {
+	text-decoration: line-through;
+}
+
+.sascom-rc-product-reason {
+	color: #8a5a00;
+	font-size: .85em;
+	font-style: italic;
+}
+
 .sascom-rc-actions {
 	display: flex;
 	gap: .6em;
@@ -135,4 +149,24 @@
 	background: #eaf7ea;
 	color: #1e5e20;
 	border: 1px solid #b7e0b9;
+}
+
+.sascom-rc-bank-note {
+	margin: 0 0 .5em;
+	padding: .6em .8em;
+	background: #f4f7fb;
+	border: 1px solid #dbe4f0;
+	border-radius: 4px;
+	color: #44546a;
+	font-size: .9em;
+}
+
+/* Honeypot anty-spam: poza ekranem (celowo nie display:none) */
+.sascom-rc-hp {
+	position: absolute;
+	left: -9999px;
+	top: -9999px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
 }

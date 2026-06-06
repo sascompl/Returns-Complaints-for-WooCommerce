@@ -43,6 +43,15 @@
 	}
 
 	/**
+	 * Bezpieczny odczyt wartości pola po ID.
+	 * Zwraca '' gdy element nie istnieje (np. opcjonalny honeypot) – bez wyjątku.
+	 */
+	function val( id ) {
+		var el = document.getElementById( id );
+		return el ? el.value : '';
+	}
+
+	/**
 	 * Bezpieczne tworzenie elementu z tekstem (bez wstrzykiwania HTML).
 	 */
 	function createEl( tag, className, text ) {
@@ -90,22 +99,38 @@
 		productsWrap.innerHTML = '';
 
 		products.forEach( function ( product ) {
-			var rowEl = createEl( 'div', 'sascom-rc-product' );
+			// available_qty liczone serwerowo (ordered − już objęte aktywnymi zgłoszeniami).
+			var available = typeof product.available_qty !== 'undefined' ? parseInt( product.available_qty, 10 ) : parseInt( product.qty, 10 );
+			var unavailable = available <= 0;
+
+			var rowEl = createEl( 'div', 'sascom-rc-product' + ( unavailable ? ' sascom-rc-product-unavailable' : '' ) );
 
 			var checkbox = document.createElement( 'input' );
 			checkbox.type = 'checkbox';
 			checkbox.className = 'sascom-rc-product-check';
 			checkbox.value = product.item_id;
 			checkbox.id = 'sascom-rc-item-' + product.item_id;
+			checkbox.disabled = unavailable;
 
 			var label = createEl( 'label', 'sascom-rc-product-label', product.name + ' ' );
 			label.htmlFor = checkbox.id;
+
+			rowEl.appendChild( checkbox );
+			rowEl.appendChild( label );
+
+			if ( unavailable ) {
+				// Produkt już objęty aktywnym zgłoszeniem – nie do zaznaczenia.
+				var reason = product.unavailable_reason || SascomRC.i18n.alreadyRequested;
+				rowEl.appendChild( createEl( 'span', 'sascom-rc-product-reason', reason ) );
+				productsWrap.appendChild( rowEl );
+				return;
+			}
 
 			var qty = document.createElement( 'input' );
 			qty.type = 'number';
 			qty.className = 'sascom-rc-product-qty';
 			qty.min = '1';
-			qty.max = String( product.qty );
+			qty.max = String( available );
 			qty.value = '1';
 			qty.setAttribute( 'data-item', product.item_id );
 			qty.disabled = true;
@@ -114,10 +139,8 @@
 				qty.disabled = ! checkbox.checked;
 			} );
 
-			var qtyHint = createEl( 'span', 'sascom-rc-product-hint', ' (max ' + product.qty + ')' );
+			var qtyHint = createEl( 'span', 'sascom-rc-product-hint', ' (max ' + available + ')' );
 
-			rowEl.appendChild( checkbox );
-			rowEl.appendChild( label );
 			rowEl.appendChild( qty );
 			rowEl.appendChild( qtyHint );
 			productsWrap.appendChild( rowEl );
@@ -174,8 +197,8 @@
 	lookupBtn.addEventListener( 'click', function () {
 		hideMessage( lookupMsg );
 
-		var orderNumber = document.getElementById( 'sascom-rc-order-number' ).value.trim();
-		var email = document.getElementById( 'sascom-rc-email' ).value.trim();
+		var orderNumber = val( 'sascom-rc-order-number' ).trim();
+		var email = val( 'sascom-rc-email' ).trim();
 
 		if ( ! orderNumber || ! email ) {
 			showMessage( lookupMsg, SascomRC.i18n.genericError );
@@ -246,12 +269,12 @@
 
 		post( {
 			action: 'sascom_rc_submit_return',
-			order_number: document.getElementById( 'sascom-rc-order-number' ).value.trim(),
-			email: document.getElementById( 'sascom-rc-email' ).value.trim(),
+			order_number: val( 'sascom-rc-order-number' ).trim(),
+			email: val( 'sascom-rc-email' ).trim(),
 			type: selectedType.value,
-			reason: document.getElementById( 'sascom-rc-reason' ).value,
-			customer_message: document.getElementById( 'sascom-rc-customer-message' ).value,
-			bank_account: document.getElementById( 'sascom-rc-bank-account' ).value,
+			customer_message: val( 'sascom-rc-customer-message' ),
+			bank_account: val( 'sascom-rc-bank-account' ),
+			sascom_rc_website: val( 'sascom-rc-website' ),
 			items: items
 		} ).then( function ( response ) {
 			if ( ! response || ! response.success ) {

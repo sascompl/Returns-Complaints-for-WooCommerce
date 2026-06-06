@@ -15,42 +15,42 @@ Lightweight WooCommerce plugin that adds a public return, withdrawal and complai
 
 == Description ==
 
-Returns & Complaints for WooCommerce dodaje publiczny formularz zgłoszenia zwrotu / odstąpienia od umowy oraz reklamacji. Formularz działa dla wszystkich klientów WooCommerce – również tych, którzy kupili bez konta.
+Returns & Complaints for WooCommerce adds a public form that lets customers submit a return (withdrawal from contract) or a complaint about a product. The form works for all WooCommerce customers, including those who ordered as guests without an account.
 
-Najważniejsze cechy:
+Features:
 
-* Formularz osadzany przez shortcode `[sascom_rc_returns_form]`.
-* Weryfikacja zamówienia po numerze zamówienia oraz adresie e-mail (billing_email).
-* Brak ujawniania danych zamówienia, jeżeli e-mail nie pasuje.
-* Dwa typy zgłoszeń: zwrot / odstąpienie od umowy oraz reklamacja / problem z produktem.
-* Wybór konkretnych produktów z zamówienia.
-* Techniczny zakres formularza online: ostatnie 30 dni (nie wydłuża ustawowego terminu zwrotu).
-* Reklamacje starsze niż 30 dni: dopuszczone z oznaczeniem „weryfikacja ręczna”.
-* Zwroty starsze niż 30 dni: komunikat kierujący do kontaktu mailowego (bez brutalnej blokady).
-* Custom post type `sascom_return_request` z dedykowanymi statusami.
-* E-mail potwierdzający do klienta oraz powiadomienie do administratora.
-* Powiązanie zgłoszenia z zamówieniem: prywatna notatka, flaga oraz kolumna na liście zamówień.
-* Zgodność z HPOS (High-Performance Order Storage).
+* Embeddable form via the `[sascom_rc_returns_form]` shortcode.
+* Order verification by order number and the e-mail address used at checkout (billing e-mail).
+* Order data is never exposed when the e-mail address does not match.
+* Two request types: return / withdrawal from contract, and complaint / product issue.
+* Selection of specific products from the order.
+* Technical scope of the online form: the last 30 days. This does not extend any statutory return deadline.
+* Complaints older than 30 days are accepted and flagged for manual verification.
+* Returns older than 30 days show a message directing the customer to contact the store by e-mail, without a hard block.
+* Custom post type `sascom_return_request` with dedicated statuses.
+* Confirmation e-mail to the customer and a notification e-mail to the store administrator.
+* Order linking: private order note, a flag, a request list and an admin-only column on the orders list.
+* Compatible with WooCommerce HPOS (High-Performance Order Storage).
 
-Wtyczka NIE wykonuje płatności, automatycznego refundu ani integracji z kurierem.
+The plugin does not process payments, automatic refunds or courier integrations.
 
 == Installation ==
 
-1. Skopiuj katalog `returns-complaints-for-woocommerce` do `wp-content/plugins/`.
-2. Aktywuj wtyczkę w panelu WordPress.
-3. Utwórz podstronę (np. `/zwroty-i-reklamacje/`) i wstaw shortcode `[sascom_rc_returns_form]`.
+1. Copy the `returns-complaints-for-woocommerce` folder to `wp-content/plugins/`.
+2. Activate the plugin in the WordPress admin (WooCommerce must be active).
+3. Create a page (for example `/returns-and-complaints/`) and add the `[sascom_rc_returns_form]` shortcode.
 
-== Statusy zgłoszeń ==
+== Request statuses ==
 
-* new – Nowe
-* manual_verification – Weryfikacja ręczna
-* waiting_for_customer_shipment – Oczekuje na wysyłkę od klienta
-* received_by_store – Odebrane przez sklep
-* refund_pending – Zwrot środków w toku
-* refund_completed – Zwrot środków zrealizowany
-* closed – Zamknięte
+* new
+* manual_verification
+* waiting_for_customer_shipment
+* received_by_store
+* refund_pending
+* refund_completed
+* closed
 
 == Changelog ==
 
 = 1.0.0 =
-* Pierwsza wersja MVP.
+* Initial release.

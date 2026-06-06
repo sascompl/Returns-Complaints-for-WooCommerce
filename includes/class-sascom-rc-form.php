@@ -48,18 +48,24 @@ class Sascom_RC_Form {
 	 * Rejestracja zasobów (CSS/JS).
 	 */
 	public function register_assets() {
+		// Wersja po filemtime – cache-busting przy każdej zmianie pliku (fallback: wersja wtyczki).
+		$css_path = SASCOM_RC_PATH . 'assets/css/sascom-rc.css';
+		$js_path  = SASCOM_RC_PATH . 'assets/js/sascom-rc.js';
+		$css_ver  = file_exists( $css_path ) ? filemtime( $css_path ) : SASCOM_RC_VERSION;
+		$js_ver   = file_exists( $js_path ) ? filemtime( $js_path ) : SASCOM_RC_VERSION;
+
 		wp_register_style(
 			'sascom-rc',
 			SASCOM_RC_URL . 'assets/css/sascom-rc.css',
 			array(),
-			SASCOM_RC_VERSION
+			$css_ver
 		);
 
 		wp_register_script(
 			'sascom-rc',
 			SASCOM_RC_URL . 'assets/js/sascom-rc.js',
 			array(),
-			SASCOM_RC_VERSION,
+			$js_ver,
 			true
 		);
 
@@ -71,9 +77,10 @@ class Sascom_RC_Form {
 				'nonce'      => wp_create_nonce( self::NONCE_ACTION ),
 				'typeReturn' => Sascom_RC_CPT::TYPE_RETURN,
 				'i18n'       => array(
-					'genericError'  => __( 'Wystąpił błąd. Spróbuj ponownie.', 'returns-complaints-for-woocommerce' ),
-					'selectProduct' => __( 'Wybierz przynajmniej jeden produkt.', 'returns-complaints-for-woocommerce' ),
-					'selectType'    => __( 'Wybierz typ zgłoszenia.', 'returns-complaints-for-woocommerce' ),
+					'genericError'    => __( 'Wystąpił błąd. Spróbuj ponownie.', 'returns-complaints-for-woocommerce' ),
+					'selectProduct'   => __( 'Wybierz przynajmniej jeden produkt.', 'returns-complaints-for-woocommerce' ),
+					'selectType'      => __( 'Wybierz typ zgłoszenia.', 'returns-complaints-for-woocommerce' ),
+					'alreadyRequested' => __( 'Ten produkt jest już objęty aktywnym zgłoszeniem.', 'returns-complaints-for-woocommerce' ),
 				),
 			)
 		);
@@ -92,6 +99,12 @@ class Sascom_RC_Form {
 		?>
 		<div class="sascom-rc">
 			<form id="sascom-rc-form" class="sascom-rc-form" autocomplete="off">
+
+				<?php // Honeypot anty-spam: ukryte pole, którego ludzie nie wypełniają. Inline fallback na wypadek niezaładowania CSS. ?>
+				<div class="sascom-rc-hp" aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
+					<label for="sascom-rc-website"><?php esc_html_e( 'Strona WWW (zostaw puste)', 'returns-complaints-for-woocommerce' ); ?></label>
+					<input type="text" id="sascom-rc-website" name="sascom_rc_website" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
+				</div>
 
 				<?php // Krok 1 – identyfikacja zamówienia. ?>
 				<div class="sascom-rc-step sascom-rc-step-1" data-step="1">
@@ -140,19 +153,15 @@ class Sascom_RC_Form {
 					</div>
 
 					<p class="sascom-rc-field">
-						<label for="sascom-rc-reason"><?php esc_html_e( 'Powód zgłoszenia', 'returns-complaints-for-woocommerce' ); ?></label>
-						<input type="text" id="sascom-rc-reason" name="reason" maxlength="200">
-					</p>
-
-					<p class="sascom-rc-field">
 						<label for="sascom-rc-customer-message"><?php esc_html_e( 'Dodatkowa wiadomość / opis problemu', 'returns-complaints-for-woocommerce' ); ?></label>
 						<textarea id="sascom-rc-customer-message" name="customer_message" rows="4" maxlength="2000"></textarea>
 					</p>
 
-					<p class="sascom-rc-field sascom-rc-bank-field" hidden>
+					<div class="sascom-rc-field sascom-rc-bank-field" hidden>
+						<p class="sascom-rc-bank-note"><?php esc_html_e( 'Zwrot środków zlecimy przez tego samego operatora płatności, którym opłaciłeś zamówienie. Jeśli chcesz, możesz podać numer konta bankowego.', 'returns-complaints-for-woocommerce' ); ?></p>
 						<label for="sascom-rc-bank-account"><?php esc_html_e( 'Numer konta bankowego do zwrotu środków (opcjonalnie)', 'returns-complaints-for-woocommerce' ); ?></label>
 						<input type="text" id="sascom-rc-bank-account" name="bank_account" maxlength="50">
-					</p>
+					</div>
 
 					<div class="sascom-rc-message sascom-rc-submit-message" role="alert" hidden></div>
 
@@ -270,6 +279,95 @@ class Sascom_RC_Form {
 	}
 
 	/**
+	 * Liczba aktywnych zgłoszeń powiązanych z danym zamówieniem.
+	 *
+	 * Wykorzystuje WP_Query (bez bezpośrednich zapytań SQL). Pobieramy maksymalnie
+	 * MAX_ACTIVE_PER_ORDER ID – tyle wystarczy do sprawdzenia limitu.
+	 *
+	 * @param int $order_id ID zamówienia.
+	 * @return int
+	 */
+	protected function count_active_requests_for_order( $order_id ) {
+		$query = new WP_Query(
+			array(
+				'post_type'              => Sascom_RC_CPT::POST_TYPE,
+				'post_status'            => 'private',
+				'fields'                 => 'ids',
+				'posts_per_page'         => Sascom_RC_CPT::MAX_ACTIVE_PER_ORDER,
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'meta_query'             => array(
+					'relation' => 'AND',
+					array(
+						'key'   => Sascom_RC_CPT::META_ORDER_ID,
+						'value' => absint( $order_id ),
+					),
+					array(
+						'key'     => Sascom_RC_CPT::META_STATUS,
+						'value'   => Sascom_RC_CPT::get_active_statuses(),
+						'compare' => 'IN',
+					),
+				),
+			)
+		);
+
+		return count( $query->posts );
+	}
+
+	/**
+	 * Sumy ilości już objętych aktywnymi zgłoszeniami, per order_item_id.
+	 *
+	 * Liczone ze wszystkich aktywnych zgłoszeń danego zamówienia (dowolny typ).
+	 * Bez bezpośrednich zapytań SQL.
+	 *
+	 * @param int $order_id ID zamówienia.
+	 * @return array Tablica: item_id => suma zgłoszonych sztuk (int).
+	 */
+	protected function get_requested_quantities_for_order( $order_id ) {
+		$totals = array();
+
+		$query = new WP_Query(
+			array(
+				'post_type'              => Sascom_RC_CPT::POST_TYPE,
+				'post_status'            => 'private',
+				'fields'                 => 'ids',
+				'posts_per_page'         => 100,
+				'no_found_rows'          => true,
+				'update_post_term_cache' => false,
+				'meta_query'             => array(
+					'relation' => 'AND',
+					array(
+						'key'   => Sascom_RC_CPT::META_ORDER_ID,
+						'value' => absint( $order_id ),
+					),
+					array(
+						'key'     => Sascom_RC_CPT::META_STATUS,
+						'value'   => Sascom_RC_CPT::get_active_statuses(),
+						'compare' => 'IN',
+					),
+				),
+			)
+		);
+
+		foreach ( $query->posts as $request_id ) {
+			$products = get_post_meta( $request_id, Sascom_RC_CPT::META_PRODUCTS, true );
+			if ( ! is_array( $products ) ) {
+				continue;
+			}
+			foreach ( $products as $product ) {
+				$item_id = isset( $product['item_id'] ) ? absint( $product['item_id'] ) : 0;
+				$qty     = isset( $product['qty'] ) ? absint( $product['qty'] ) : 0;
+				if ( $item_id ) {
+					$totals[ $item_id ] = ( isset( $totals[ $item_id ] ) ? $totals[ $item_id ] : 0 ) + $qty;
+				}
+			}
+		}
+
+		return $totals;
+	}
+
+	/**
 	 * AJAX – krok 1: weryfikacja zamówienia i zwrot listy produktów.
 	 */
 	public function ajax_lookup_order() {
@@ -277,6 +375,16 @@ class Sascom_RC_Form {
 
 		$order_number = isset( $_POST['order_number'] ) ? sanitize_text_field( wp_unslash( $_POST['order_number'] ) ) : '';
 		$email        = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
+
+		// Rate limit: IP zawsze, e-mail jeśli poprawny, numer jeśli niepusty.
+		$ip = Sascom_RC_Rate_Limiter::get_client_ip();
+		if ( Sascom_RC_Rate_Limiter::is_lookup_blocked( $ip, $email, $order_number ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Zbyt wiele prób. Spróbuj ponownie za kilka minut.', 'returns-complaints-for-woocommerce' ),
+				)
+			);
+		}
 
 		$order = $this->get_verified_order( $order_number, $email );
 
@@ -289,12 +397,23 @@ class Sascom_RC_Form {
 			);
 		}
 
+		$requested = $this->get_requested_quantities_for_order( $order->get_id() );
+
 		$products = array();
 		foreach ( $this->get_order_items( $order ) as $item_id => $item ) {
+			$already    = isset( $requested[ $item_id ] ) ? (int) $requested[ $item_id ] : 0;
+			$available  = (int) $item['qty'] - $already;
+			$available  = $available > 0 ? $available : 0;
+
 			$products[] = array(
-				'item_id' => $item_id,
-				'name'    => $item['name'],
-				'qty'     => $item['qty'],
+				'item_id'               => $item_id,
+				'name'                  => $item['name'],
+				'qty'                   => $item['qty'],
+				'already_requested_qty' => $already,
+				'available_qty'         => $available,
+				'unavailable_reason'    => $available <= 0
+					? __( 'Ten produkt jest już objęty aktywnym zgłoszeniem.', 'returns-complaints-for-woocommerce' )
+					: '',
 			);
 		}
 
@@ -326,11 +445,14 @@ class Sascom_RC_Form {
 		$reason           = isset( $_POST['reason'] ) ? sanitize_text_field( wp_unslash( $_POST['reason'] ) ) : '';
 		$customer_message = isset( $_POST['customer_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['customer_message'] ) ) : '';
 		$bank_account     = isset( $_POST['bank_account'] ) ? sanitize_text_field( wp_unslash( $_POST['bank_account'] ) ) : '';
+		$honeypot         = isset( $_POST['sascom_rc_website'] ) ? sanitize_text_field( wp_unslash( $_POST['sascom_rc_website'] ) ) : '';
 
-		// Pozycje: klucze (item_id) i wartości (ilości) sanityzowane od razu do dodatnich int.
-		$raw_items = array();
-		if ( isset( $_POST['items'] ) && is_array( $_POST['items'] ) ) {
-			foreach ( wp_unslash( $_POST['items'] ) as $item_key => $item_qty ) {
+		// Pozycje: pobrane przez filter_input (bez bezpośredniego dostępu do $_POST);
+		// klucze (item_id) i wartości (ilości) sanityzowane do dodatnich int.
+		$raw_items    = array();
+		$posted_items = filter_input( INPUT_POST, 'items', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		if ( is_array( $posted_items ) ) {
+			foreach ( $posted_items as $item_key => $item_qty ) {
 				$raw_items[ absint( $item_key ) ] = absint( $item_qty );
 			}
 		}
@@ -339,6 +461,27 @@ class Sascom_RC_Form {
 		$reason           = $this->limit_length( $reason, 200 );
 		$customer_message = $this->limit_length( $customer_message, 2000 );
 		$bank_account     = $this->limit_length( $bank_account, 50 );
+
+		// --- Honeypot anty-spam ---
+		// Pole wypełniają tylko boty. Nie tworzymy zgłoszenia, nie logujemy, nie pokazujemy błędu –
+		// zwracamy taki sam komunikat sukcesu jak przy normalnym zgłoszeniu.
+		if ( '' !== $honeypot ) {
+			wp_send_json_success(
+				array(
+					'message' => __( 'Dziękujemy! Twoje zgłoszenie zostało przyjęte. Potwierdzenie wysłaliśmy na podany adres e-mail.', 'returns-complaints-for-woocommerce' ),
+				)
+			);
+		}
+
+		// --- Rate limit: IP zawsze, e-mail jeśli poprawny ---
+		$ip = Sascom_RC_Rate_Limiter::get_client_ip();
+		if ( Sascom_RC_Rate_Limiter::is_submit_blocked( $ip, $email ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Zbyt wiele prób. Spróbuj ponownie za kilka minut.', 'returns-complaints-for-woocommerce' ),
+				)
+			);
+		}
 
 		// --- Walidacja zamówienia + e-mail (ponowna, po stronie serwera) ---
 		$order = $this->get_verified_order( $order_number, $email );
@@ -368,7 +511,10 @@ class Sascom_RC_Form {
 		}
 
 		// --- Walidacja wybranych produktów względem pozycji zamówienia ---
+		// Per order_item_id: nie pozwalamy zgłosić więcej niż pozostała ilość
+		// (ordered − już objęte aktywnymi zgłoszeniami). Nie ufamy frontendowi.
 		$order_items     = $this->get_order_items( $order );
+		$requested       = $this->get_requested_quantities_for_order( $order->get_id() );
 		$chosen_products = array();
 
 		foreach ( $raw_items as $item_id => $qty ) {
@@ -379,9 +525,16 @@ class Sascom_RC_Form {
 				continue;
 			}
 
-			$max_qty = $order_items[ $item_id ]['qty'];
-			if ( $qty > $max_qty ) {
-				$qty = $max_qty;
+			$already   = isset( $requested[ $item_id ] ) ? (int) $requested[ $item_id ] : 0;
+			$available = (int) $order_items[ $item_id ]['qty'] - $already;
+
+			// Produkt już w całości objęty aktywnym zgłoszeniem albo żądanie przekracza dostępną ilość.
+			if ( $qty > $available ) {
+				wp_send_json_error(
+					array(
+						'message' => __( 'Wybrana ilość przekracza ilość dostępną do zgłoszenia.', 'returns-complaints-for-woocommerce' ),
+					)
+				);
 			}
 
 			$chosen_products[] = array(
@@ -392,7 +545,16 @@ class Sascom_RC_Form {
 		}
 
 		if ( empty( $chosen_products ) ) {
-			wp_send_json_error( array( 'message' => __( 'Wybierz przynajmniej jeden produkt.', 'returns-complaints-for-woocommerce' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Wybierz przynajmniej jeden produkt dostępny do zgłoszenia.', 'returns-complaints-for-woocommerce' ) ) );
+		}
+
+		// --- Limit aktywnych zgłoszeń na zamówienie ---
+		if ( $this->count_active_requests_for_order( $order->get_id() ) >= Sascom_RC_CPT::MAX_ACTIVE_PER_ORDER ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Dla tego zamówienia istnieje już zgłoszenie w toku. Skontaktuj się ze sklepem, aby kontynuować.', 'returns-complaints-for-woocommerce' ),
+				)
+			);
 		}
 
 		// --- Status zgłoszenia ---
@@ -408,8 +570,8 @@ class Sascom_RC_Form {
 			array(
 				'post_type'   => Sascom_RC_CPT::POST_TYPE,
 				'post_status' => 'private',
-				/* translators: 1: typ zgłoszenia, 2: numer zamówienia */
 				'post_title'  => sprintf(
+					/* translators: 1: typ zgłoszenia, 2: numer zamówienia */
 					__( '%1$s – zamówienie #%2$s', 'returns-complaints-for-woocommerce' ),
 					Sascom_RC_CPT::get_type_label( $type ),
 					$order->get_order_number()

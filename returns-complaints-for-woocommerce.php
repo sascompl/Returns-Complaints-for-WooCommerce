@@ -7,7 +7,6 @@
  * Author:            Sascom - Bartosz Sudół
  * Author URI:        https://sascom.pl/
  * Text Domain:       returns-complaints-for-woocommerce
- * Domain Path:       /languages
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -65,19 +64,14 @@ add_action(
 		}
 
 		require_once SASCOM_RC_PATH . 'includes/class-sascom-rc-cpt.php';
+		require_once SASCOM_RC_PATH . 'includes/class-sascom-rc-rate-limiter.php';
 		require_once SASCOM_RC_PATH . 'includes/class-sascom-rc-emails.php';
 		require_once SASCOM_RC_PATH . 'includes/class-sascom-rc-form.php';
 		require_once SASCOM_RC_PATH . 'includes/class-sascom-rc-admin.php';
+		require_once SASCOM_RC_PATH . 'includes/class-sascom-rc-settings.php';
 		require_once SASCOM_RC_PATH . 'includes/class-sascom-rc.php';
 
 		Sascom_RC::instance()->init();
-
-		// Tłumaczenia.
-		load_plugin_textdomain(
-			'returns-complaints-for-woocommerce',
-			false,
-			dirname( plugin_basename( __FILE__ ) ) . '/languages'
-		);
 	}
 );
 

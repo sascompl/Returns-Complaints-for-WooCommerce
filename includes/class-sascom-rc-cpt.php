@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Klasa odpowiedzialna za typ wpisu sascom_return_request.
+ * Klasa odpowiedzialna za typ wpisu sascom_rc_request.
  */
 class Sascom_RC_CPT {
 
-	const POST_TYPE = 'sascom_return_request';
+	const POST_TYPE = 'sascom_rc_request'; // 17 znaków (limit WordPress: 20).
 
 	/**
 	 * Klucze meta zgłoszenia.
@@ -41,6 +41,11 @@ class Sascom_RC_CPT {
 	 */
 	const TYPE_RETURN    = 'return';
 	const TYPE_COMPLAINT = 'complaint';
+
+	/**
+	 * Maksymalna liczba aktywnych zgłoszeń przypadających na jedno zamówienie.
+	 */
+	const MAX_ACTIVE_PER_ORDER = 3;
 
 	/**
 	 * Rejestracja hooków.
@@ -104,6 +109,23 @@ class Sascom_RC_CPT {
 			'refund_pending'                => __( 'Zwrot środków w toku', 'returns-complaints-for-woocommerce' ),
 			'refund_completed'              => __( 'Zwrot środków zrealizowany', 'returns-complaints-for-woocommerce' ),
 			'closed'                        => __( 'Zamknięte', 'returns-complaints-for-woocommerce' ),
+		);
+	}
+
+	/**
+	 * Statusy uznawane za „aktywne" (zgłoszenie w toku).
+	 *
+	 * Statusy zamknięte: refund_completed, closed.
+	 *
+	 * @return array
+	 */
+	public static function get_active_statuses() {
+		return array(
+			'new',
+			'manual_verification',
+			'waiting_for_customer_shipment',
+			'received_by_store',
+			'refund_pending',
 		);
 	}
 
