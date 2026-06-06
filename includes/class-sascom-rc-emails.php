@@ -101,9 +101,9 @@ class Sascom_RC_Emails {
 			$body .= "\n" . __( 'Uwaga: ponieważ zamówienie jest starsze niż 30 dni, sprawa zostanie zweryfikowana ręcznie przez nasz zespół.', 'returns-complaints-for-woocommerce' ) . "\n";
 		}
 
-		// Instrukcja odesłania – tylko dla zwrotu / odstąpienia od umowy.
-		if ( Sascom_RC_CPT::TYPE_RETURN === $data['type'] ) {
-			$body .= $this->return_shipping_instructions();
+		// Instrukcja odesłania – dla zwrotu oraz reklamacji (osobne dane/instrukcje).
+		if ( in_array( $data['type'], array( Sascom_RC_CPT::TYPE_RETURN, Sascom_RC_CPT::TYPE_COMPLAINT ), true ) ) {
+			$body .= $this->shipping_instructions( $data['type'] );
 		}
 
 		$body .= "\n" . __( 'Skontaktujemy się z Tobą w sprawie dalszych kroków.', 'returns-complaints-for-woocommerce' ) . "\n\n";
@@ -117,26 +117,40 @@ class Sascom_RC_Emails {
 	}
 
 	/**
-	 * Sekcja „Instrukcja odesłania produktu" do maila klienta (tekst).
+	 * Sekcja z danymi/instrukcją odesłania do maila klienta (tekst).
 	 *
-	 * Wartości są w pełni filtrowalne i domyślnie puste – wtyczka publiczna
-	 * nie zawiera zaszytych danych sklepu. Pokazujemy tylko niepuste pola.
+	 * Dla zwrotu i reklamacji – osobne dane (filtrowalne, domyślnie puste).
+	 * Wtyczka publiczna nie zawiera zaszytych danych sklepu; pokazujemy tylko
+	 * niepuste pola.
 	 *
+	 * @param string $type Typ zgłoszenia (return|complaint).
 	 * @return string Pusty string, jeśli żadne pole nie zostało ustawione.
 	 */
-	protected function return_shipping_instructions() {
-		// Wartości z ustawień jako domyślne; filtry mogą je nadpisać.
-		$settings = Sascom_RC_Settings::get_settings();
+	protected function shipping_instructions( $type ) {
+		if ( Sascom_RC_CPT::TYPE_COMPLAINT === $type ) {
+			$base = Sascom_RC_Settings::get_complaint_data();
 
-		$address      = (string) apply_filters( 'sascom_rc_return_shipping_address', $settings['shipping_address'] );
-		$parcel       = (string) apply_filters( 'sascom_rc_return_parcel_locker', $settings['parcel_locker'] );
-		$instructions = (string) apply_filters( 'sascom_rc_return_instructions', $settings['instructions'] );
-		$contact      = (string) apply_filters( 'sascom_rc_return_contact_email', $settings['contact_email'] );
+			$address      = (string) apply_filters( 'sascom_rc_complaint_shipping_address', $base['address'] );
+			$parcel       = (string) apply_filters( 'sascom_rc_complaint_parcel_locker', $base['parcel'] );
+			$instructions = (string) apply_filters( 'sascom_rc_complaint_instructions', $base['instructions'] );
+			$contact      = (string) apply_filters( 'sascom_rc_complaint_contact_email', $base['contact'] );
+			$header       = __( 'Instrukcja dotycząca reklamacji:', 'returns-complaints-for-woocommerce' );
+			$address_label = __( 'Adres do reklamacji:', 'returns-complaints-for-woocommerce' );
+		} else {
+			$base = Sascom_RC_Settings::get_return_data();
+
+			$address      = (string) apply_filters( 'sascom_rc_return_shipping_address', $base['address'] );
+			$parcel       = (string) apply_filters( 'sascom_rc_return_parcel_locker', $base['parcel'] );
+			$instructions = (string) apply_filters( 'sascom_rc_return_instructions', $base['instructions'] );
+			$contact      = (string) apply_filters( 'sascom_rc_return_contact_email', $base['contact'] );
+			$header       = __( 'Instrukcja odesłania produktu:', 'returns-complaints-for-woocommerce' );
+			$address_label = __( 'Adres zwrotu:', 'returns-complaints-for-woocommerce' );
+		}
 
 		$lines = array();
 
 		if ( '' !== trim( $address ) ) {
-			$lines[] = __( 'Adres zwrotu:', 'returns-complaints-for-woocommerce' ) . ' ' . $address;
+			$lines[] = $address_label . ' ' . $address;
 		}
 		if ( '' !== trim( $parcel ) ) {
 			$lines[] = __( 'Paczkomat:', 'returns-complaints-for-woocommerce' ) . ' ' . $parcel;
@@ -152,7 +166,7 @@ class Sascom_RC_Emails {
 			return '';
 		}
 
-		return "\n" . __( 'Instrukcja odesłania produktu:', 'returns-complaints-for-woocommerce' ) . "\n" . implode( "\n", $lines ) . "\n";
+		return "\n" . $header . "\n" . implode( "\n", $lines ) . "\n";
 	}
 
 	/**
